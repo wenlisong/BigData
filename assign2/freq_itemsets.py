@@ -1,6 +1,3 @@
-from itertools import combinations
-import pdb
-
 SUPPORT = 100
 
 
@@ -21,13 +18,23 @@ def get_candi_itemsets(data):
 
     for key, val in enumerate(cnt_list):
         if val >= SUPPORT:
-            candidate_itemsets.append(key)
+            candidate_itemsets.append([key])
     return candidate_itemsets
 
 
-def gen_k_itemsets(itemsets_k_1, k, buckets):
+def gen_k_itemsets(itemsets_k_1, buckets):
     itemsets_k = []
-    for comb in combinations(itemsets_k_1, k):
+    # elem list without repetition
+    elem_list = set([elem for itemset in itemsets_k_1 for elem in itemset])
+
+    # generate all candidate itemsets
+    tmp_itemsets = []
+    for itemset in itemsets_k_1:
+        for elem in elem_list:
+            if elem > itemset[-1]:
+                tmp_itemsets.append(itemset + [elem])
+
+    for comb in tmp_itemsets:
         cnt = 0
         for bucket in buckets:
             for elem in comb:
@@ -44,22 +51,21 @@ def main():
     candidate_itemsets = get_candi_itemsets(buckets)
     # generate itemsets of size k
     k = 2
-    itemsets_k_1 = candidate_itemsets.copy()
-    while True:
-        candidate_itemsets_k = gen_k_itemsets(itemsets_k_1, k, buckets)
-        if len(candidate_itemsets_k) == 0:
-            break
-        candidate_itemsets.extend(candidate_itemsets_k)
-        pdb.set_trace()
-        itemsets_k_1 = candidate_itemsets_k
-        k += 1
-
-    with open('top_100_freq_items', 'w') as f:
-        for item in candidate_itemsets:
-            try:
+    itemsets_k_1 = candidate_itemsets
+    with open('A.txt', 'w') as f:
+        # output k = 1
+        for item in itemsets_k_1:
+            f.write(' '.join(map(str, item)) + '\n')
+        while True:
+            candidate_itemsets_k = gen_k_itemsets(itemsets_k_1, buckets)
+            if len(candidate_itemsets_k) == 0:
+                break
+            # output k >= 2
+            for item in candidate_itemsets_k:
                 f.write(' '.join(map(str, item)) + '\n')
-            except TypeError:
-                f.write('{0}\n'.format(item))
+            itemsets_k_1 = candidate_itemsets_k
+
+            k += 1
 
 
 if __name__ == '__main__':
