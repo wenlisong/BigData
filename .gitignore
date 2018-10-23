@@ -1,3 +1,6 @@
 ml-20m/
 *.idea/
 .vscode/
+.DS_Store
+top_*
+wri*
