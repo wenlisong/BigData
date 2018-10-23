@@ -50,7 +50,7 @@ def gen_k_itemsets(itemsets_k_1, buckets):
             if elem > itemset[-1]:
                 tmp_itemsets.append(itemset + [elem])
 
-    cpu_cnt = multiprocessing.cpu_count()
+    cpu_cnt = 10
     pool = multiprocessing.Pool(processes=cpu_cnt)
     result = []
     gap = int(len(tmp_itemsets) / cpu_cnt)
